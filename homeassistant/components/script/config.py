@@ -1,13 +1,10 @@
 """Config validation helper for the script integration."""
 from __future__ import annotations
-
 from collections.abc import Mapping
 from contextlib import suppress
 from typing import Any
-
 import voluptuous as vol
 from voluptuous.humanize import humanize_error
-
 from homeassistant.components.blueprint import (
     BlueprintException,
     is_blueprint_instance_config,
@@ -39,7 +36,6 @@ from homeassistant.helpers.script import (
 from homeassistant.helpers.selector import validate_selector
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.yaml.input import UndefinedSubstitution
-
 from .const import (
     CONF_ADVANCED,
     CONF_EXAMPLE,
@@ -50,9 +46,7 @@ from .const import (
     LOGGER,
 )
 from .helpers import async_get_blueprints
-
 PACKAGE_MERGE_HINT = "dict"
-
 _MINIMAL_SCRIPT_ENTITY_SCHEMA = vol.Schema(
     {
         CONF_ALIAS: cv.string,
@@ -60,14 +54,12 @@ _MINIMAL_SCRIPT_ENTITY_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
-
 _INVALID_OBJECT_IDS = {
     SERVICE_RELOAD,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     SERVICE_TOGGLE,
 }
-
 _SCRIPT_OBJECT_ID_SCHEMA = vol.All(
     cv.slug,
     vol.NotIn(
@@ -78,7 +70,6 @@ _SCRIPT_OBJECT_ID_SCHEMA = vol.All(
         ),
     ),
 )
-
 SCRIPT_ENTITY_SCHEMA = make_script_schema(
     {
         vol.Optional(CONF_ALIAS): cv.string,
@@ -101,8 +92,6 @@ SCRIPT_ENTITY_SCHEMA = make_script_schema(
     },
     SCRIPT_MODE_SINGLE,
 )
-
-
 async def _async_validate_config_item(
     hass: HomeAssistant,
     object_id: str,
@@ -134,6 +123,7 @@ async def _async_validate_config_item(
 
     _validate_script_object_id(object_id)
     script_name = f"Script with object id '{object_id}'"
+
     if isinstance(config, Mapping) and CONF_ALIAS in config:
         script_name = f"Script with alias '{config[CONF_ALIAS]}'"
 
@@ -178,7 +168,6 @@ async def async_validate_config_item(
     """Validate config item, called by EditScriptConfigView."""
     return await _async_validate_config_item(hass, object_id, config, True, False)
 
-
 async def async_validate_config(hass, config):
     """Validate config."""
     scripts = {}
@@ -190,10 +179,8 @@ async def async_validate_config(hass, config):
             cfg = await _try_async_validate_config_item(hass, object_id, cfg)
             if cfg is not None:
                 scripts[object_id] = cfg
-
     # Create a copy of the configuration with all config for the current
     # component removed and add validated config back in.
     config = config_without_domain(config, DOMAIN)
     config[DOMAIN] = scripts
-
     return config
