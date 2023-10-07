@@ -25,7 +25,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_remove_config_entry_device(
-    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
+    hass: HomeAssistant, device_entry: DeviceEntry
 ) -> bool:
     """Remove iBeacon config entry from a device."""
     coordinator: IBeaconCoordinator = hass.data[DOMAIN]
