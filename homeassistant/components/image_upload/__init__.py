@@ -19,7 +19,6 @@ from homeassistant.const import CONF_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import collection, config_validation as cv
 from homeassistant.helpers.storage import Store
-from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
 
 from .const import DOMAIN
@@ -41,7 +40,7 @@ UPDATE_FIELDS = {
 CONFIG_SCHEMA = cv.empty_config_schema(DOMAIN)
 
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+async def async_setup(hass: HomeAssistant) -> bool:
     """Set up the Image integration."""
     image_dir = pathlib.Path(hass.config.path("image"))
     hass.data[DOMAIN] = storage_collection = ImageStorageCollection(hass, image_dir)
