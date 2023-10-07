@@ -23,7 +23,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import PlatformNotReady, TemplateError
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import Throttle
 
 from . import create_influx_url, get_influx_connection, validate_version_specific_config
@@ -157,8 +157,7 @@ PLATFORM_SCHEMA = vol.All(
 def setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    add_entities: AddEntitiesCallback
 ) -> None:
     """Set up the InfluxDB component."""
     try:
