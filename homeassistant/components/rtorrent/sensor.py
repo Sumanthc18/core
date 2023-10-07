@@ -1,11 +1,7 @@
-"""Support for monitoring the rtorrent BitTorrent client API."""
 from __future__ import annotations
-
 import logging
 import xmlrpc.client
-
 import voluptuous as vol
-
 from homeassistant.components.sensor import (
     PLATFORM_SCHEMA,
     SensorDeviceClass,
@@ -38,6 +34,7 @@ SENSOR_TYPE_DOWNLOADING_TORRENTS = "downloading_torrents"
 SENSOR_TYPE_ACTIVE_TORRENTS = "active_torrents"
 
 DEFAULT_NAME = "rtorrent"
+
 SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         key=SENSOR_TYPE_CURRENT_STATUS,
@@ -103,19 +100,19 @@ def setup_platform(
     """Set up the rtorrent sensors."""
     url = config[CONF_URL]
     name = config[CONF_NAME]
-
+    
     try:
         rtorrent = xmlrpc.client.ServerProxy(url)
     except (xmlrpc.client.ProtocolError, ConnectionRefusedError) as ex:
         _LOGGER.error("Connection to rtorrent daemon failed")
         raise PlatformNotReady from ex
+    
     monitored_variables = config[CONF_MONITORED_VARIABLES]
     entities = [
         RTorrentSensor(rtorrent, name, description)
         for description in SENSOR_TYPES
         if description.key in monitored_variables
     ]
-
     add_entities(entities)
 
 
@@ -127,23 +124,19 @@ def format_speed(speed):
 
 class RTorrentSensor(SensorEntity):
     """Representation of an rtorrent sensor."""
-
+    
     def __init__(
         self, rtorrent_client, client_name, description: SensorEntityDescription
     ) -> None:
         """Initialize the sensor."""
         self.entity_description = description
         self.client = rtorrent_client
-        import xmlrpc.client
-
-class TorrentSensor:
-    def __init__(self, client, client_name, description):
-        self.client = client
         self.data = None
         self._attr_name = f"{client_name} {description.name}"
         self._attr_available = False
 
-    def _get_data(self):
+    def update(self):
+        """Get the latest data from rtorrent and update the state."""
         multicall = xmlrpc.client.MultiCall(self.client)
         multicall.throttle.global_up.rate()
         multicall.throttle.global_down.rate()
@@ -159,54 +152,37 @@ class TorrentSensor:
         except (xmlrpc.client.ProtocolError, OSError) as ex:
             _LOGGER.error("Connection to rtorrent failed (%s)", ex)
             self._attr_available = False
-
-    def _count_torrents(self):
-        uploading_torrents = sum(1 for up_torrent in self.data[5] if up_torrent[0])
-        downloading_torrents = sum(1 for down_torrent in self.data[6] if down_torrent[0])
-        return uploading_torrents, downloading_torrents
-
-    def update(self):
-        self._get_data()
-        if not self.data:
-            self._attr_native_value = None
             return
         
+        upload = self.data[0]
+        download = self.data[1]
+        all_torrents = self.data[2]
+        stopped_torrents = self.data[3]
+        complete_torrents = self.data[4]
+        uploading_torrents = sum(1 for up_torrent in self.data[5] if up_torrent[0])
+        downloading_torrents = sum(1 for down_torrent in self.data[6] if down_torrent[0])
+        active_torrents = uploading_torrents + downloading_torrents
         sensor_type = self.entity_description.key
-
+        
         if sensor_type == SENSOR_TYPE_CURRENT_STATUS:
-            upload, download = self.data[0], self.data[1]
-            if upload > 0 and download > 0:
-                self._attr_native_value = "up_down"
-            elif upload > 0 and download == 0:
-                self._attr_native_value = "seeding"
-            elif upload == 0 and download > 0:
-                self._attr_native_value = "downloading"
+            if self.data:
+                if upload > 0 and download > 0:
+                    self._attr_native_value = "up_down"
+                elif upload > 0 and download == 0:
+                    self._attr_native_value = "seeding"
+                elif upload == 0 and download > 0:
+                    self._attr_native_value = "downloading"
+                else:
+                    self._attr_native_value = STATE_IDLE
             else:
-                self._attr_native_value = STATE_IDLE
-
-        elif sensor_type == SENSOR_TYPE_DOWNLOAD_SPEED:
-            self._attr_native_value = format_speed(self.data[1])
-
-        elif sensor_type == SENSOR_TYPE_UPLOAD_SPEED:
-            self._attr_native_value = format_speed(self.data[0])
-
-        elif sensor_type == SENSOR_TYPE_ALL_TORRENTS:
-            self._attr_native_value = len(self.data[2])
-
-        elif sensor_type == SENSOR_TYPE_STOPPED_TORRENTS:
-            self._attr_native_value = len(self.data[3])
-
-        elif sensor_type == SENSOR_TYPE_COMPLETE_TORRENTS:
-            self._attr_native_value = len(self.data[4])
-
-        elif sensor_type == SENSOR_TYPE_UPLOADING_TORRENTS:
-            uploading_torrents, _ = self._count_torrents()
-            self._attr_native_value = uploading_torrents
-
-        elif sensor_type == SENSOR_TYPE_DOWNLOADING_TORRENTS:
-            _, downloading_torrents = self._count_torrents()
-            self._attr_native_value = downloading_torrents
-
-        elif sensor_type == SENSOR_TYPE_ACTIVE_TORRENTS:
-            uploading_torrents, downloading_torrents = self._count_torrents()
-            self._attr_native_value = uploading_torrents + downloading_torrents
+                self._attr_native_value = None
+        
+        if self.data:
+            if sensor_type == SENSOR_TYPE_DOWNLOAD_SPEED:
+                self._attr_native_value = format_speed(download)
+            elif sensor_type == SENSOR_TYPE_UPLOAD_SPEED:
+                self._attr_native_value = format_speed(upload)
+            elif sensor_type == SENSOR_TYPE_ALL_TORRENTS:
+                self._attr_native_value = len(all_torrents)
+            elif sensor_type == SENSOR_TYPE_STOPPED_TORRENTS:
+                self._attr_native_value = len(stopped_torrents)
