@@ -52,8 +52,7 @@ WATERING_TIME_ICON = "mdi:water-pump"
 def setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    add_entities: AddEntitiesCallback
 ) -> None:
     """Set up a sensor for a Hydrawise device."""
     coordinator: HydrawiseDataUpdateCoordinator = hass.data[DOMAIN]
