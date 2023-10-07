@@ -26,7 +26,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, ServiceCall
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import ConfigType
 
 from . import ATTR_EVENT, DOMAIN, SERVICE_PUSH_ALARM_STATE, SERVICE_TRIGGER
 
@@ -75,8 +75,7 @@ PUSH_ALARM_STATE_SERVICE_SCHEMA = vol.Schema(
 def setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    add_entities: AddEntitiesCallback
 ) -> None:
     """Set up a control panel managed through IFTTT."""
     if DATA_IFTTT_ALARM not in hass.data:
