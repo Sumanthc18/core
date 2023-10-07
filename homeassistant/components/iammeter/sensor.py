@@ -43,8 +43,7 @@ PLATFORM_TIMEOUT = 8
 async def async_setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
-    async_add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    async_add_entities: AddEntitiesCallback
 ) -> None:
     """Platform setup."""
     config_host = config[CONF_HOST]
