@@ -20,7 +20,6 @@ from .util import generate_unique_id
 
 _LOGGER = logging.getLogger(__name__)
 
-
 REQUEST_REFRESH_DELAY = 2
 HEATER_COOLDOWN_DELAY = 6
 
@@ -96,79 +95,85 @@ async def _async_migrate_entries(
     for entry in er.async_entries_for_config_entry(
         entity_registry, config_entry.entry_id
     ):
-        source_mac, source_key = entry.unique_id.split("_", 1)
-
-        source_index = None
-        if (
-            len(key_parts := source_key.rsplit("_", 1)) == 2
-            and key_parts[1].isdecimal()
-        ):
-            source_key, source_index = key_parts
-
-        _LOGGER.debug(
-            "Checking migration status for '%s' against key '%s'",
-            entry.unique_id,
-            source_key,
-        )
+        source_mac, source_key, source_index = get_source_info(entry.unique_id)
 
         if source_key not in ENTITY_MIGRATIONS:
             continue
 
-        _LOGGER.debug(
-            "Evaluating migration of '%s' from migration key '%s'",
-            entry.entity_id,
-            source_key,
-        )
         migrations = ENTITY_MIGRATIONS[source_key]
-        updates: dict[str, Any] = {}
-        new_key = migrations["new_key"]
-        if new_key in SHARED_VALUES:
-            if (device := migrations.get("device")) is None:
-                _LOGGER.debug(
-                    "Shared key '%s' is missing required migration data 'device'",
-                    new_key,
-                )
-                continue
-            assert device is not None and (
-                device != "pump" or (device == "pump" and source_index is not None)
-            )
-            new_unique_id = (
-                f"{source_mac}_{generate_unique_id(device, source_index, new_key)}"
-            )
-        else:
-            new_unique_id = entry.unique_id.replace(source_key, new_key)
+        updates = {}
 
-        if new_unique_id and new_unique_id != entry.unique_id:
-            if existing_entity_id := entity_registry.async_get_entity_id(
-                entry.domain, entry.platform, new_unique_id
-            ):
-                _LOGGER.debug(
-                    "Cannot migrate '%s' to unique_id '%s', already exists for entity '%s'. Aborting",
-                    entry.unique_id,
-                    new_unique_id,
-                    existing_entity_id,
-                )
-                continue
+        new_key = migrations["new_key"]
+        new_unique_id = generate_new_unique_id(
+            source_mac, source_index, new_key, entry, migrations
+        )
+
+        if should_migrate_unique_id(entry, new_unique_id, entity_registry):
             updates["new_unique_id"] = new_unique_id
 
-        if (old_name := migrations.get("old_name")) is not None:
-            assert old_name
-            new_name = migrations["new_name"]
-            if (s_old_name := slugify(old_name)) in entry.entity_id:
-                new_entity_id = entry.entity_id.replace(s_old_name, slugify(new_name))
-                if new_entity_id and new_entity_id != entry.entity_id:
-                    updates["new_entity_id"] = new_entity_id
-
-            if entry.original_name and old_name in entry.original_name:
-                new_original_name = entry.original_name.replace(old_name, new_name)
-                if new_original_name and new_original_name != entry.original_name:
-                    updates["original_name"] = new_original_name
+        update_entity_names(entry, migrations)
 
         if updates:
-            _LOGGER.debug(
-                "Migrating entity '%s' unique_id from '%s' to '%s'",
-                entry.entity_id,
-                entry.unique_id,
-                new_unique_id,
+            update_entity(entry, updates, entity_registry)
+
+
+def get_source_info(unique_id):
+    source_mac, source_key = unique_id.split("_", 1)
+    source_index = get_source_index(source_key)
+    return source_mac, source_key, source_index
+
+
+def get_source_index(source_key):
+    source_index = None
+    if (
+        len(key_parts := source_key.rsplit("_", 1)) == 2
+        and key_parts[1].isdecimal()
+    ):
+        source_key, source_index = key_parts
+    return source_index
+
+
+def should_migrate_unique_id(entry, new_unique_id, entity_registry):
+    if new_unique_id and new_unique_id != entry.unique_id:
+        existing_entity_id = entity_registry.async_get_entity_id(
+            entry.domain, entry.platform, new_unique_id
+        )
+        if not existing_entity_id:
+            return True
+    return False
+
+
+def update_entity_names(entry, migrations):
+    old_name = migrations.get("old_name")
+
+    if old_name:
+        new_name = migrations["new_name"]
+        if old_name_in_entity_id(entry, old_name):
+            new_entity_id = entry.entity_id.replace(
+                slugify(old_name), slugify(new_name)
             )
-            entity_registry.async_update_entity(entry.entity_id, **updates)
+            if new_entity_id and new_entity_id != entry.entity_id:
+                updates["new_entity_id"] = new_entity_id
+
+        if old_name_in_original_name(entry, old_name):
+            new_original_name = entry.original_name.replace(old_name, new_name)
+            if new_original_name and new_original_name != entry.original_name:
+                updates["original_name"] = new_original_name
+
+
+def old_name_in_entity_id(entry, old_name):
+    return slugify(old_name) in entry.entity_id
+
+
+def old_name_in_original_name(entry, old_name):
+    return entry.original_name and old_name in entry.original_name
+
+
+def update_entity(entry, updates, entity_registry):
+    _LOGGER.debug(
+        "Migrating entity '%s' unique_id from '%s' to '%s'",
+        entry.entity_id,
+        entry.unique_id,
+        updates["new_unique_id"],
+    )
+    entity_registry.async_update_entity(entry.entity_id, **updates)
