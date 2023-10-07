@@ -93,7 +93,7 @@ OPTIONS_SCHEMA_ADVANCED = {
 
 
 async def validate_input(
-    hass: HomeAssistant, user_input: dict[str, Any]
+  user_input: dict[str, Any]
 ) -> dict[str, str]:
     """Validate user input."""
     errors = {}
