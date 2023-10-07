@@ -50,7 +50,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 def setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
-    add_entities: AddEntitiesCallback,
+    add_entities: AddEntitiesCallback
 ) -> None:
     """Set up a sensor for a Hydrawise device."""
     coordinator: HydrawiseDataUpdateCoordinator = hass.data[DOMAIN]
