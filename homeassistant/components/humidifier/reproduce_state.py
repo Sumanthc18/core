@@ -24,7 +24,7 @@ async def _async_reproduce_states(
     hass: HomeAssistant,
     state: State,
     *,
-    context: Context | None = None,
+    context: Context | None = None
 ) -> None:
     """Reproduce component states."""
     if (cur_state := hass.states.get(state.entity_id)) is None:
