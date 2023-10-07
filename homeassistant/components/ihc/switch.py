@@ -8,7 +8,7 @@ from ihcsdk.ihccontroller import IHCController
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import DiscoveryInfoType
 
 from .const import CONF_OFF_ID, CONF_ON_ID, DOMAIN, IHC_CONTROLLER
 from .ihcdevice import IHCDevice
@@ -17,7 +17,6 @@ from .util import async_pulse, async_set_bool
 
 def setup_platform(
     hass: HomeAssistant,
-    config: ConfigType,
     add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
