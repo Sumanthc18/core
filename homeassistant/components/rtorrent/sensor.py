@@ -134,13 +134,16 @@ class RTorrentSensor(SensorEntity):
         """Initialize the sensor."""
         self.entity_description = description
         self.client = rtorrent_client
-        self.data = None
+        import xmlrpc.client
 
+class TorrentSensor:
+    def __init__(self, client, client_name, description):
+        self.client = client
+        self.data = None
         self._attr_name = f"{client_name} {description.name}"
         self._attr_available = False
 
-    def update(self):
-        """Get the latest data from rtorrent and updates the state."""
+    def _get_data(self):
         multicall = xmlrpc.client.MultiCall(self.client)
         multicall.throttle.global_up.rate()
         multicall.throttle.global_down.rate()
@@ -149,61 +152,61 @@ class RTorrentSensor(SensorEntity):
         multicall.d.multicall2("", "complete")
         multicall.d.multicall2("", "seeding", "d.up.rate=")
         multicall.d.multicall2("", "leeching", "d.down.rate=")
-
+        
         try:
             self.data = multicall()
             self._attr_available = True
         except (xmlrpc.client.ProtocolError, OSError) as ex:
             _LOGGER.error("Connection to rtorrent failed (%s)", ex)
             self._attr_available = False
+
+    def _count_torrents(self):
+        uploading_torrents = sum(1 for up_torrent in self.data[5] if up_torrent[0])
+        downloading_torrents = sum(1 for down_torrent in self.data[6] if down_torrent[0])
+        return uploading_torrents, downloading_torrents
+
+    def update(self):
+        self._get_data()
+        if not self.data:
+            self._attr_native_value = None
             return
-
-        upload = self.data[0]
-        download = self.data[1]
-        all_torrents = self.data[2]
-        stopped_torrents = self.data[3]
-        complete_torrents = self.data[4]
-
-        uploading_torrents = 0
-        for up_torrent in self.data[5]:
-            if up_torrent[0]:
-                uploading_torrents += 1
-
-        downloading_torrents = 0
-        for down_torrent in self.data[6]:
-            if down_torrent[0]:
-                downloading_torrents += 1
-
-        active_torrents = uploading_torrents + downloading_torrents
-
+        
         sensor_type = self.entity_description.key
-        if sensor_type == SENSOR_TYPE_CURRENT_STATUS:
-            if self.data:
-                if upload > 0 and download > 0:
-                    self._attr_native_value = "up_down"
-                elif upload > 0 and download == 0:
-                    self._attr_native_value = "seeding"
-                elif upload == 0 and download > 0:
-                    self._attr_native_value = "downloading"
-                else:
-                    self._attr_native_value = STATE_IDLE
-            else:
-                self._attr_native_value = None
 
-        if self.data:
-            if sensor_type == SENSOR_TYPE_DOWNLOAD_SPEED:
-                self._attr_native_value = format_speed(download)
-            elif sensor_type == SENSOR_TYPE_UPLOAD_SPEED:
-                self._attr_native_value = format_speed(upload)
-            elif sensor_type == SENSOR_TYPE_ALL_TORRENTS:
-                self._attr_native_value = len(all_torrents)
-            elif sensor_type == SENSOR_TYPE_STOPPED_TORRENTS:
-                self._attr_native_value = len(stopped_torrents)
-            elif sensor_type == SENSOR_TYPE_COMPLETE_TORRENTS:
-                self._attr_native_value = len(complete_torrents)
-            elif sensor_type == SENSOR_TYPE_UPLOADING_TORRENTS:
-                self._attr_native_value = uploading_torrents
-            elif sensor_type == SENSOR_TYPE_DOWNLOADING_TORRENTS:
-                self._attr_native_value = downloading_torrents
-            elif sensor_type == SENSOR_TYPE_ACTIVE_TORRENTS:
-                self._attr_native_value = active_torrents
+        if sensor_type == SENSOR_TYPE_CURRENT_STATUS:
+            upload, download = self.data[0], self.data[1]
+            if upload > 0 and download > 0:
+                self._attr_native_value = "up_down"
+            elif upload > 0 and download == 0:
+                self._attr_native_value = "seeding"
+            elif upload == 0 and download > 0:
+                self._attr_native_value = "downloading"
+            else:
+                self._attr_native_value = STATE_IDLE
+
+        elif sensor_type == SENSOR_TYPE_DOWNLOAD_SPEED:
+            self._attr_native_value = format_speed(self.data[1])
+
+        elif sensor_type == SENSOR_TYPE_UPLOAD_SPEED:
+            self._attr_native_value = format_speed(self.data[0])
+
+        elif sensor_type == SENSOR_TYPE_ALL_TORRENTS:
+            self._attr_native_value = len(self.data[2])
+
+        elif sensor_type == SENSOR_TYPE_STOPPED_TORRENTS:
+            self._attr_native_value = len(self.data[3])
+
+        elif sensor_type == SENSOR_TYPE_COMPLETE_TORRENTS:
+            self._attr_native_value = len(self.data[4])
+
+        elif sensor_type == SENSOR_TYPE_UPLOADING_TORRENTS:
+            uploading_torrents, _ = self._count_torrents()
+            self._attr_native_value = uploading_torrents
+
+        elif sensor_type == SENSOR_TYPE_DOWNLOADING_TORRENTS:
+            _, downloading_torrents = self._count_torrents()
+            self._attr_native_value = downloading_torrents
+
+        elif sensor_type == SENSOR_TYPE_ACTIVE_TORRENTS:
+            uploading_torrents, downloading_torrents = self._count_torrents()
+            self._attr_native_value = uploading_torrents + downloading_torrents
