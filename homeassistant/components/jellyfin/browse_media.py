@@ -35,7 +35,6 @@ PLAYABLE_MEDIA_TYPES = [
 
 
 async def item_payload(
-    hass: HomeAssistant,
     client: JellyfinClient,
     user_id: str,
     item: dict[str, Any],
