@@ -34,7 +34,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 
 def get_service(
-    hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> JoinNotificationService | None:
