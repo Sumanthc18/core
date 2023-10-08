@@ -32,7 +32,6 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.reload import async_setup_reload_service
 from homeassistant.helpers.typing import (
     ConfigType,
-    DiscoveryInfoType,
     EventType,
     StateType,
 )
@@ -109,7 +108,6 @@ async def async_setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
     async_add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up the min/max/mean sensor."""
     entity_ids: list[str] = config[CONF_ENTITY_IDS]
