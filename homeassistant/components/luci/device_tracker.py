@@ -38,7 +38,7 @@ PLATFORM_SCHEMA = PARENT_PLATFORM_SCHEMA.extend(
 )
 
 
-def get_scanner(hass: HomeAssistant, config: ConfigType) -> LuciDeviceScanner | None:
+def get_scanner(config: ConfigType) -> LuciDeviceScanner | None:
     """Validate the configuration and return a Luci scanner."""
     scanner = LuciDeviceScanner(config[DOMAIN])
 
