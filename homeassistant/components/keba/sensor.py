@@ -10,14 +10,13 @@ from homeassistant.components.sensor import (
 from homeassistant.const import UnitOfElectricCurrent, UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import DiscoveryInfoType
 
 from . import DOMAIN, KebaHandler
 
 
 async def async_setup_platform(
     hass: HomeAssistant,
-    config: ConfigType,
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
