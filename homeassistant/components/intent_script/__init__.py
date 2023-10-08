@@ -62,7 +62,7 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 
-async def async_reload(hass: HomeAssistant, servie_call: ServiceCall) -> None:
+async def async_reload(hass: HomeAssistant) -> None:
     """Handle start Intent Script service call."""
     new_config = await async_integration_yaml_config(hass, DOMAIN)
     existing_intents = hass.data[DOMAIN]
