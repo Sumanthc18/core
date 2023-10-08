@@ -20,7 +20,6 @@ from homeassistant.const import Platform, UnitOfEnergy, UnitOfTemperature, UnitO
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
-from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
 
 DOMAIN = "kitchen_sink"
@@ -37,7 +36,7 @@ COMPONENTS_WITH_DEMO_PLATFORM = [
 CONFIG_SCHEMA = cv.empty_config_schema(DOMAIN)
 
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+async def async_setup(hass: HomeAssistant) -> bool:
     """Set up the demo environment."""
     hass.async_create_task(
         hass.config_entries.flow.async_init(
