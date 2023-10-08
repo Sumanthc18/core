@@ -66,7 +66,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
 
 async def async_setup_platform(
     hass: HomeAssistant,
-    async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up a sensor for a Logi Circle device. Obsolete."""
