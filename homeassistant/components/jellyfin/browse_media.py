@@ -36,7 +36,6 @@ PLAYABLE_MEDIA_TYPES = [
 
 async def item_payload(
     client: JellyfinClient,
-    user_id: str,
     item: dict[str, Any],
 ) -> BrowseMedia:
     """Create response payload for a single media item."""
