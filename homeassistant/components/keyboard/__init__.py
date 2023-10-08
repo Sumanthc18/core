@@ -12,7 +12,6 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.typing import ConfigType
 
 DOMAIN = "keyboard"
 
@@ -21,7 +20,7 @@ TAP_KEY_SCHEMA = vol.Schema({})
 CONFIG_SCHEMA = cv.empty_config_schema(DOMAIN)
 
 
-def setup(hass: HomeAssistant, config: ConfigType) -> bool:
+def setup(hass: HomeAssistant) -> bool:
     """Listen for keyboard events."""
 
     keyboard = PyKeyboard()
