@@ -9,7 +9,7 @@ import lupupy.constants as CONST
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import DiscoveryInfoType
 
 from . import DOMAIN as LUPUSEC_DOMAIN, LupusecDevice
 
@@ -18,7 +18,6 @@ SCAN_INTERVAL = timedelta(seconds=2)
 
 def setup_platform(
     hass: HomeAssistant,
-    config: ConfigType,
     add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
