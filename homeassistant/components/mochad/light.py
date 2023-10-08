@@ -18,7 +18,7 @@ from homeassistant.const import CONF_ADDRESS, CONF_DEVICES, CONF_NAME, CONF_PLAT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import ConfigType
 
 from . import CONF_COMM_TYPE, DOMAIN, REQ_LOCK, MochadCtrl
 
@@ -46,7 +46,6 @@ def setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
     add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up X10 dimmers over a mochad controller."""
     mochad_controller: MochadCtrl = hass.data[DOMAIN]
