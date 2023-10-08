@@ -16,7 +16,7 @@ from homeassistant.components.climate import (
 from homeassistant.const import ATTR_TEMPERATURE, PRECISION_WHOLE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import DiscoveryInfoType
+
 
 from . import DATA_MELISSA
 
@@ -36,7 +36,6 @@ FAN_MODES = [FAN_AUTO, FAN_HIGH, FAN_MEDIUM, FAN_LOW]
 async def async_setup_platform(
     hass: HomeAssistant,
     async_add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Iterate through and add all Melissa devices."""
     api = hass.data[DATA_MELISSA]
