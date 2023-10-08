@@ -11,7 +11,7 @@ from homeassistant.const import CONF_NAME, UnitOfTime
 from homeassistant.core import HomeAssistant
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import ConfigType
 
 ATTR_STATION = "Station"
 ATTR_ORIGIN = "Origin"
@@ -48,8 +48,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(
     config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    add_entities: AddEntitiesCallback
 ) -> None:
     """Set up the Irish Rail transport sensor."""
 
