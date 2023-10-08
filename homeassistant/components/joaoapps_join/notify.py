@@ -16,7 +16,7 @@ from homeassistant.components.notify import (
 from homeassistant.const import CONF_API_KEY, CONF_DEVICE_ID
 from homeassistant.core import HomeAssistant
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import ConfigType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +35,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def get_service(
     config: ConfigType,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> JoinNotificationService | None:
     """Get the Join notification service."""
     api_key = config.get(CONF_API_KEY)
