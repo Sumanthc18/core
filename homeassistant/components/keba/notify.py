@@ -3,14 +3,13 @@ from __future__ import annotations
 
 from homeassistant.components.notify import ATTR_DATA, BaseNotificationService
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import DiscoveryInfoType
 
 from . import DOMAIN
 
 
 async def async_get_service(
     hass: HomeAssistant,
-    config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> KebaNotificationService:
     """Return the notify service."""
