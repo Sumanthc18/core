@@ -172,7 +172,7 @@ class Iperf3Data:
         """Return the port on the host connected to."""
         return self._host[CONF_PORT]
 
-    def update(self, now=None):
+    def update(self):
         """Get the latest data from iperf3."""
         if self.protocol == "udp":
             # UDP only have 1 way attribute
