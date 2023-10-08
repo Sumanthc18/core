@@ -21,7 +21,6 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import DiscoveryInfoType
 from homeassistant.util.dt import as_local
 
 from .const import ATTRIBUTION, DEVICE_BRAND, DOMAIN as LOGI_CIRCLE_DOMAIN
@@ -66,7 +65,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
 
 async def async_setup_platform(
     hass: HomeAssistant,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up a sensor for a Logi Circle device. Obsolete."""
     _LOGGER.warning("Logi Circle no longer works with sensor platform configuration")
