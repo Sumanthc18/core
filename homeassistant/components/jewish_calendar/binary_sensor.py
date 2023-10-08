@@ -16,7 +16,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers import event
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import DiscoveryInfoType
 import homeassistant.util.dt as dt_util
 
 from . import DOMAIN
@@ -58,7 +58,6 @@ BINARY_SENSORS: tuple[JewishCalendarBinarySensorEntityDescription, ...] = (
 
 async def async_setup_platform(
     hass: HomeAssistant,
-    config: ConfigType,
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
