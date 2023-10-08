@@ -6,7 +6,6 @@ from typing import Any
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import DiscoveryInfoType
 
 from . import LUTRON_CONTROLLER, LUTRON_DEVICES, LutronDevice
 
@@ -14,7 +13,6 @@ from . import LUTRON_CONTROLLER, LUTRON_DEVICES, LutronDevice
 def setup_platform(
     hass: HomeAssistant,
     add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up the Lutron switches."""
     devs = []
