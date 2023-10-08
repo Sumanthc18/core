@@ -28,7 +28,7 @@ class LookinPushCoordinator:
         """Remember the last push time."""
         self.last_update = time.monotonic()
 
-    def active(self, interval: timedelta) -> bool:
+    def active(self) -> bool:
         """Check if the last push update was recently."""
         time_since_last_update = time.monotonic() - self.last_update
         is_active = time_since_last_update < POLLING_FALLBACK_SECONDS
