@@ -152,7 +152,6 @@ def fetch_items(
 async def get_media_info(
     hass: HomeAssistant,
     client: JellyfinClient,
-    media_content_type: str | None,
     media_content_id: str,
 ) -> tuple[str | None, list[dict[str, Any]] | None, str | None]:
     """Fetch media info."""
