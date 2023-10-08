@@ -23,7 +23,7 @@ from homeassistant.helpers.frame import report
 from homeassistant.helpers.integration_platform import (
     async_process_integration_platforms,
 )
-from homeassistant.helpers.typing import UNDEFINED, ConfigType, UndefinedType
+from homeassistant.helpers.typing import UNDEFINED, UndefinedType
 from homeassistant.loader import bind_hass
 
 from . import local_source
@@ -70,7 +70,7 @@ def generate_media_source_id(domain: str, identifier: str) -> str:
     return uri
 
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+async def async_setup(hass: HomeAssistant) -> bool:
     """Set up the media_source component."""
     hass.data[DOMAIN] = {}
     websocket_api.async_register_command(hass, websocket_browse_media)
